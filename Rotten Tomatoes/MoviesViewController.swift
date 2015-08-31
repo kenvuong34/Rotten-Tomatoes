@@ -19,23 +19,30 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        refreshControl = UIRefreshControl()
-        refreshControl.addTarget(self, action: "onRefresh", forControlEvents: UIControlEvents.ValueChanged)
-        tableView.insertSubview(refreshControl, atIndex: 0)
-        let url = NSURL(string: "http://api.rottentomatoes.com/api/public/v1.0/lists/movies/box_office.json?apikey=dagqdghwaq3e3mxyrp7kmmj5&limit=20&country=us")!
+        if(checkNetwork()){
+            refreshControl = UIRefreshControl()
+            refreshControl.addTarget(self, action: "onRefresh", forControlEvents: UIControlEvents.ValueChanged)
+            tableView.insertSubview(refreshControl, atIndex: 0)
+            JTProgressHUD .show();
+            let url = NSURL(string: "http://api.rottentomatoes.com/api/public/v1.0/lists/movies/box_office.json?apikey=dagqdghwaq3e3mxyrp7kmmj5&limit=20&country=us")!
         
             let request = NSURLRequest(URL: url)
         
-        NSURLConnection.sendAsynchronousRequest(request, queue: NSOperationQueue.mainQueue()) { (reponse: NSURLResponse!,data: NSData!,error: NSError!) -> Void in
+            NSURLConnection.sendAsynchronousRequest(request, queue: NSOperationQueue.mainQueue()) { (reponse: NSURLResponse!,data: NSData!,error: NSError!) -> Void in
                 let json = NSJSONSerialization.JSONObjectWithData(data, options: nil, error: nil) as? NSDictionary
             if let json = json{
                 self.movies = json["movies"] as? [NSDictionary]
                 self.tableView.reloadData()
                 println(json)
             }
-        }
-        tableView.dataSource = self
-        tableView.delegate = self
+            JTProgressHUD .hide();
+            }
+            tableView.dataSource = self
+            tableView.delegate = self
+        } else{
+            let alertController = UIAlertController(title: "Network Error", message: "No internet network", preferredStyle: UIAlertControllerStyle.Alert)
+            alertController.addAction(UIAlertAction(title: "Dismiss", style: UIAlertActionStyle.Default,handler: nil))
+            self.presentViewController(alertController, animated: true, completion: nil)        }
     }
 
     override func didReceiveMemoryWarning() {
@@ -81,6 +88,27 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         delay(2, closure: {self.refreshControl.endRefreshing()})
         println("on refresh")
     }
+    func checkNetwork()->Bool{
+        var Status:Bool = false
+        let url = NSURL(string: "http://google.com/")
+        let request = NSMutableURLRequest(URL: url!)
+        request.HTTPMethod = "HEAD"
+        request.cachePolicy = NSURLRequestCachePolicy.ReloadIgnoringLocalAndRemoteCacheData
+        request.timeoutInterval = 10.0
+        
+        var response: NSURLResponse?
+        
+        var data = NSURLConnection.sendSynchronousRequest(request, returningResponse: &response, error: nil) as NSData?
+        
+        if let httpResponse = response as? NSHTTPURLResponse {
+            if httpResponse.statusCode == 200 {
+                Status = true
+            }
+        }
+        
+        return Status
+    }
+    
 }
 
 

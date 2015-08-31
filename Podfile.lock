@@ -20,11 +20,14 @@ PODS:
   - AFNetworking/UIKit (2.6.0):
     - AFNetworking/NSURLConnection
     - AFNetworking/NSURLSession
+  - JTProgressHUD (1.0.2)
 
 DEPENDENCIES:
   - AFNetworking (~> 2.5)
+  - JTProgressHUD
 
 SPEC CHECKSUMS:
   AFNetworking: 79f7eb1a0fcfa7beb409332b2ca49afe9ce53b05
+  JTProgressHUD: 8d85c057c7784f25494ffc266ad4ddefe178bee1
 
 COCOAPODS: 0.38.2
